@@ -270,7 +270,9 @@
       <p class="eyebrow">A practical beginner's guide</p>
       <h1>About Hibernate</h1>
       <p class="hero-copy">Understand what it is, why Java developers use it, how it works with databases, and how it fits into a Spring application.</p>
-      <a class="hero-link" href="#what-is-hibernate">Start learning <span aria-hidden="true">↓</span></a>
+      <nav aria-label="Page sections">
+        <a class="hero-link" href="#what-is-hibernate">Start learning <span aria-hidden="true">↓</span></a>
+      </nav>
     </div>
   </header>
 
@@ -278,61 +280,61 @@
     <div class="intro-grid">
       <section class="card" id="what-is-hibernate">
         <h2>What is Hibernate?</h2>
-        <p>Hibernate is an open-source <strong>Object-Relational Mapping (ORM)</strong> framework for Java. It connects Java objects to relational database tables, so an application can work with objects while Hibernate handles much of the database communication.</p>
-        <p>For example, a Java <code class="inline-code">Customer</code> object can correspond to a row in a <code class="inline-code">customers</code> table. Hibernate maps the object's fields to that row's columns.</p>
+        <p>Hibernate is an open-source <strong>Object-Relational Mapping (ORM)</strong> framework for Java. It helps map Java objects to relational database tables and handles SQL generation, object persistence, and query execution.</p>
+        <p>Instead of writing lots of repetitive JDBC code, you work with Java entities, and Hibernate takes care of the database communication.</p>
       </section>
       <aside class="card definition">
         <strong>In one sentence</strong>
-        <p>Hibernate translates between your Java object model and relational database operations.</p>
+        <p>Hibernate bridges the gap between Java objects and relational database tables.</p>
       </aside>
     </div>
 
     <section class="card lesson" id="why-hibernate">
       <h2>Why did Hibernate come about?</h2>
-      <p>Relational databases store data in tables and rows, while Java programs typically represent data as objects. Before ORM tools became common, developers often had to write repetitive JDBC code to open connections, create SQL statements, bind values, run queries, read each result column, and turn the results into Java objects.</p>
-      <p>This mismatch—objects in code, tables in the database—is often called the <strong>object-relational impedance mismatch</strong>. Hibernate was created to reduce that repetitive work and let developers describe how their Java objects relate to database tables.</p>
+      <p>Java applications work with objects, while databases store data in rows and columns. This difference is called the <strong>object-relational mismatch</strong>. Hibernate was created to reduce the tedious work of manually converting Java objects into SQL and back again.</p>
+      <p>Before ORM, developers often wrote code like JDBC statements, result-set mapping, and manual SQL handling. Hibernate simplifies that by letting developers focus on the domain model.</p>
 
-      <h3>Before ORM: write SQL and map results yourself</h3>
-      <div class="code-wrap" aria-label="Example of manual JDBC code">
+      <h3>Example: manual JDBC vs Hibernate</h3>
+      <div class="code-wrap">
         <pre><code>String sql = "SELECT id, name FROM customers WHERE id = ?";
-PreparedStatement statement = connection.prepareStatement(sql);
-statement.setLong(1, customerId);
-ResultSet results = statement.executeQuery();
+PreparedStatement stmt = connection.prepareStatement(sql);
+stmt.setLong(1, customerId);
+ResultSet rs = stmt.executeQuery();
 
-if (results.next()) {
+if (rs.next()) {
     Customer customer = new Customer();
-    customer.setId(results.getLong("id"));
-    customer.setName(results.getString("name"));
+    customer.setId(rs.getLong("id"));
+    customer.setName(rs.getString("name"));
 }</code></pre>
       </div>
-      <p class="muted">With Hibernate, a common lookup can instead load the mapped object for you:</p>
-      <div class="code-wrap" aria-label="Example of loading an object with Hibernate">
+      <p class="muted">With Hibernate, the same operation can be much simpler:</p>
+      <div class="code-wrap">
         <pre><code>Customer customer = session.find(Customer.class, customerId);</code></pre>
       </div>
-      <div class="callout"><strong>Important:</strong> Hibernate can generate SQL for many common operations, so you do not have to hand-write every query. It does not eliminate SQL entirely: you can still use JPQL/HQL, Criteria queries, or native SQL when they are a better fit.</div>
     </section>
 
     <section class="card lesson" id="how-it-works">
       <h2>How does Hibernate work?</h2>
-      <p>You define Java entity classes and map them to database tables. Hibernate reads those mappings and uses them to generate SQL, send it to the database, and convert database results back into Java objects.</p>
+      <p>Hibernate uses metadata, usually annotations or XML mappings, to know how Java classes correspond to database tables. It then uses that metadata to generate SQL statements automatically.</p>
       <div class="steps">
         <div class="step">
           <span class="step-number">1</span>
-          <strong>Map your entity</strong>
-          <p>Annotations such as <code class="inline-code">@Entity</code>, <code class="inline-code">@Id</code>, and <code class="inline-code">@Column</code> describe the table and its fields.</p>
+          <strong>Define entity</strong>
+          <p>Create a Java class and map it to a table using annotations such as <code class="inline-code">@Entity</code>, <code class="inline-code">@Id</code>, and <code class="inline-code">@Column</code>.</p>
         </div>
         <div class="step">
           <span class="step-number">2</span>
-          <strong>Work with objects</strong>
-          <p>Use Hibernate's session or Jakarta Persistence's <code class="inline-code">EntityManager</code> to find, save, update, or delete entities.</p>
+          <strong>Use session</strong>
+          <p>Open a Hibernate session or use <code class="inline-code">EntityManager</code> to save, update, delete, or load objects.</p>
         </div>
         <div class="step">
           <span class="step-number">3</span>
-          <strong>Hibernate talks to the database</strong>
-          <p>It generates SQL, binds values, executes statements, and maps returned rows back to objects.</p>
+          <strong>Generate SQL</strong>
+          <p>Hibernate creates the SQL, executes it, and converts rows back into Java objects.</p>
         </div>
       </div>
-      <div class="code-wrap" aria-label="Example of a Hibernate entity">
+
+      <div class="code-wrap" aria-label="Example entity class in Hibernate">
         <pre><code>import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -342,139 +344,115 @@ public class Customer {
     @Id
     @GeneratedValue
     private Long id;
+
     private String name;
 
-    protected Customer() { }
-    public Customer(String name) { this.name = name; }
+    protected Customer() {}
+
+    public Customer(String name) {
+        this.name = name;
+    }
+
     public Long getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 }</code></pre>
       </div>
-      <p class="muted">A real application also configures a database connection, manages transactions, and handles schema changes intentionally. The entity needs an identifier, and JPA entities normally have a protected or public no-argument constructor.</p>
     </section>
 
-    <section class="card lesson" id="database-connection">
-      <h2>Connect Hibernate to a database</h2>
-      <p>Hibernate connects through JDBC. It needs a JDBC driver for your database and the database connection details: a <strong>JDBC URL</strong>, username, and password. The URL tells the driver which database server, port, and database name to connect to.</p>
-
-      <h3>Example: Spring Boot with Oracle Database</h3>
-      <p>Add Spring Data JPA and the Oracle JDBC driver to the project. Spring Boot's JPA starter brings in Hibernate and manages compatible dependency versions for you.</p>
-      <p class="muted">For Maven, add <code class="inline-code">spring-boot-starter-data-jpa</code> and the runtime driver <code class="inline-code">com.oracle.database.jdbc:ojdbc11</code>. Choose an Oracle JDBC driver version compatible with your Java version and Oracle Database. The Oracle driver version is not managed by every Spring Boot dependency-management setup, so specify a compatible version when needed.</p>
-      <p>Create <code class="inline-code">src/main/resources/application.properties</code>:</p>
-      <div class="code-wrap" aria-label="Example Spring Boot database configuration">
-        <pre><code>spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/FREEPDB1
-spring.datasource.username=${DB_USERNAME}
-spring.datasource.password=${DB_PASSWORD}
-
-# Use a migration tool such as Flyway or Liquibase in production.
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=true</code></pre>
-      </div>
-      <p>Here <code class="inline-code">jdbc:oracle:thin:@//localhost:1521/FREEPDB1</code> uses Oracle's Thin JDBC driver to connect to the Oracle Database service named <code class="inline-code">FREEPDB1</code> on this computer at port <code class="inline-code">1521</code>. Use the service name provided by your Oracle installation or database administrator. Set the <code class="inline-code">DB_USERNAME</code> and <code class="inline-code">DB_PASSWORD</code> environment variables before starting the application. The placeholders keep credentials out of the source file.</p>
-      <div class="callout"><strong>Security:</strong> Never commit a real database password to Git or publish it in code. Use environment variables for local development and a secret manager or protected deployment configuration in production. Use TLS and database accounts with only the permissions the application needs.</div>
-
-      <h3>What happens when the application starts?</h3>
-      <ol class="check-list">
-        <li>The JDBC driver understands the database-specific URL and protocol.</li>
-        <li>Spring Boot reads the URL and credentials and creates a connection pool.</li>
-        <li>Hibernate uses those pooled connections to check mappings and perform database work.</li>
-        <li>Your repositories or <code class="inline-code">EntityManager</code> call Hibernate, which issues SQL inside transactions.</li>
-      </ol>
-      <p>When using Hibernate without Spring Boot, configure the same JDBC driver, URL, username, and password as Hibernate connection properties and create a <code class="inline-code">SessionFactory</code>. Choose one configuration approach for your application; Spring Boot applications typically use <code class="inline-code">spring.datasource.*</code>.</p>
-    </section>
-
-    <section class="card lesson" id="working-with-data">
-      <h2>Saving and reading data</h2>
-      <p>Hibernate tracks entities in a persistence context. Within a transaction, it notices changes to managed entities and synchronizes them with the database when the transaction commits. This means a separate SQL <code class="inline-code">UPDATE</code> is often not needed for a changed, managed object.</p>
-      <div class="code-wrap" aria-label="Example of saving and updating an entity">
-        <pre><code>// Inside a Spring service method with a transaction
-Customer customer = new Customer("Amina");
-entityManager.persist(customer); // Insert when the transaction commits
-
-Customer existing = entityManager.find(Customer.class, customerId);
-if (existing != null) {
-    existing.setName("Amina Khan"); // Tracked; Hibernate writes the change
-}</code></pre>
-      </div>
-      <p>In Spring applications, a service method is commonly marked <code class="inline-code">@Transactional</code> so related database operations either commit together or roll back together if an error occurs. With plain Hibernate, application code begins and commits or rolls back the transaction explicitly.</p>
-
-      <h3>Finding data with a query</h3>
-      <p>For a simple lookup by primary key, use <code class="inline-code">find</code>. For filtering, JPA offers JPQL, a query language written in terms of entity classes and their fields rather than table names and columns:</p>
-      <div class="code-wrap" aria-label="Example of a parameterized JPQL query">
-        <pre><code>List&lt;Customer&gt; customers = entityManager
-    .createQuery(
-        "select c from Customer c where c.name = :name",
-        Customer.class)
-    .setParameter("name", "Amina")
-    .getResultList();</code></pre>
-      </div>
-      <p>Parameters keep values separate from the query text. Hibernate converts JPQL to database SQL. Native SQL is also available when needed, but queries should be parameterized rather than built by concatenating user input.</p>
-      <p>For an Oracle database, a native SQL query can use Oracle's SQL syntax and real table and column names:</p>
-      <div class="code-wrap" aria-label="Example of parameterized Oracle SQL">
-        <pre><code>List&lt;Object[]&gt; rows = entityManager
-    .createNativeQuery(
-        "SELECT CUSTOMER_ID, NAME FROM CUSTOMERS WHERE CUSTOMER_ID = :id")
-    .setParameter("id", customerId)
-    .getResultList();</code></pre>
-      </div>
-      <p class="muted">Use JPQL when you want a query based on mapped Java entities. Use a native Oracle SQL query when you specifically need Oracle SQL features or want to query tables directly. Hibernate can generate Oracle-compatible SQL for entity operations when connected with the Oracle JDBC driver.</p>
-    </section>
-
-    <section class="card lesson" id="entities-and-relationships">
-      <h2>Entities, relationships, and schema changes</h2>
-      <p>Entities can describe database relationships. For example, many orders may belong to one customer. JPA annotations such as <code class="inline-code">@ManyToOne</code> and <code class="inline-code">@OneToMany</code> represent these relationships. The database still stores them using keys and constraints.</p>
-      <ul class="check-list">
-        <li><strong>Lazy loading</strong> fetches some related data only when it is accessed. It can save work, but the needed session or transaction must still be available.</li>
-        <li><strong>Eager loading</strong> retrieves related data immediately. Too much eager loading can make a query unnecessarily large.</li>
-        <li><strong>Cascades</strong> propagate selected operations between related entities. Configure them deliberately so saving or deleting one object does not cause unwanted changes.</li>
-      </ul>
-      <p>Schema generation also needs care. Hibernate's <code class="inline-code">ddl-auto</code> setting controls whether it validates or changes database tables. <code class="inline-code">validate</code> checks mappings without changing the schema; <code class="inline-code">update</code> attempts changes and may be useful for experiments, but it is not a reliable production migration strategy. Production teams commonly use Flyway or Liquibase to version and review schema changes.</p>
-      <h3>Common Hibernate terms</h3>
+    <section class="card lesson" id="core-concepts">
+      <h2>Core Hibernate concepts</h2>
       <ul class="check-list">
         <li><strong>Entity:</strong> a Java class mapped to a database table.</li>
-        <li><strong>Session / EntityManager:</strong> an interface for working with entities and persistence operations.</li>
-        <li><strong>Transaction:</strong> a group of operations committed or rolled back together.</li>
-        <li><strong>Persistence context:</strong> the set of managed entities Hibernate tracks during a unit of work.</li>
-        <li><strong>Dialect:</strong> database-specific SQL behavior. Hibernate can generally determine the dialect from the JDBC connection.</li>
+        <li><strong>Session:</strong> the main interface for interacting with Hibernate and managing persistence operations.</li>
+        <li><strong>Transaction:</strong> a unit of work that is committed or rolled back as one logical action.</li>
+        <li><strong>Persistence context:</strong> the first-level cache where Hibernate tracks managed entities.</li>
+        <li><strong>Relationship mapping:</strong> associations such as <code class="inline-code">@OneToMany</code>, <code class="inline-code">@ManyToOne</code>, and <code class="inline-code">@ManyToMany</code>.</li>
+        <li><strong>Dialect:</strong> database-specific SQL behavior, such as Oracle, MySQL, PostgreSQL, or SQL Server.</li>
       </ul>
     </section>
 
-    <section class="card lesson" id="hibernate-spring">
-      <h2>Hibernate and Spring: what came first?</h2>
-      <p><strong>Hibernate existed before the Spring Framework.</strong> It began in 2001, while Spring's first public release followed in 2003. Hibernate did not arrive as a feature of Spring; it is a separate persistence framework that Spring applications can integrate with.</p>
-      <p>Spring helps create and connect application components and manage concerns such as dependency injection and transactions. Hibernate handles object-relational persistence. In a Spring application, Spring Data JPA is often used as a convenient repository layer, and Hibernate is frequently the JPA provider underneath it.</p>
-      <div class="callout">Spring Data JPA is not Hibernate. JPA (now Jakarta Persistence) is a standard API; Hibernate is a popular implementation of that standard. Spring Data JPA can use Hibernate behind the scenes.</div>
+    <section class="card lesson" id="hibernate-vs-jdbc">
+      <h2>Hibernate vs JDBC</h2>
       <table class="comparison">
         <thead>
-          <tr><th>Approach</th><th>What you commonly write</th><th>Who handles row/object mapping?</th></tr>
+          <tr>
+            <th>Approach</th>
+            <th>What you usually write</th>
+            <th>What Hibernate/JPA does</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td>JDBC</td><td>SQL plus connection and result-handling code</td><td>Your application code</td></tr>
-          <tr><td>Hibernate / JPA</td><td>Entity mappings and persistence operations; queries when needed</td><td>Hibernate, using your mappings</td></tr>
-          <tr><td>Spring Data JPA + Hibernate</td><td>Repository interfaces and entity mappings; custom queries when needed</td><td>Spring Data and Hibernate together</td></tr>
+          <tr>
+            <td>JDBC</td>
+            <td>SQL, connection code, prepared statements, result-set mapping</td>
+            <td>Nothing automatically; you handle everything manually</td>
+          </tr>
+          <tr>
+            <td>Hibernate / JPA</td>
+            <td>Entity classes and persistence calls</td>
+            <td>Generates SQL and maps results to Java objects</td>
+          </tr>
+          <tr>
+            <td>Spring Data JPA + Hibernate</td>
+            <td>Repositories, entity mappings, custom queries when needed</td>
+            <td>Spring manages wiring while Hibernate handles persistence</td>
+          </tr>
         </tbody>
       </table>
     </section>
 
+    <section class="card lesson" id="hibernate-spring">
+      <h2>Hibernate and Spring</h2>
+      <p><strong>Hibernate existed before Spring.</strong> It is a separate persistence framework, while Spring is a broader application framework. In a Spring application, Spring often manages dependency injection and transaction boundaries, while Hibernate handles persistence.</p>
+      <p>In Spring Boot projects, developers commonly use <strong>Spring Data JPA</strong> and Hibernate underneath it. JPA is the standard API, and Hibernate is one of its most popular implementations.</p>
+      <div class="callout">
+        <strong>Important:</strong> Spring Data JPA is not the same as Hibernate. It is a higher-level abstraction that often uses Hibernate behind the scenes.
+      </div>
+    </section>
+
+    <section class="card lesson" id="database-config">
+      <h2>How Hibernate connects to a database</h2>
+      <p>Hibernate uses JDBC to connect to a database. You need a database driver, a JDBC URL, a username, and a password. The database URL tells Hibernate which database server and database to connect to.</p>
+      <p>In a Spring Boot project, this configuration usually goes in <code class="inline-code">application.properties</code> or <code class="inline-code">application.yml</code>.</p>
+      <div class="code-wrap">
+        <pre><code>spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.username=system
+spring.datasource.password=secret
+spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
+spring.jpa.hibernate.ddl-auto=update</code></pre>
+      </div>
+      <p class="muted">In real applications, it is also important to manage transactions carefully and choose a schema strategy that fits your environment.</p>
+    </section>
+
+    <section class="card lesson" id="advantages">
+      <h2>Advantages of Hibernate</h2>
+      <ul class="check-list">
+        <li>Reduces repetitive JDBC and SQL boilerplate.</li>
+        <li>Improves productivity when working with Java objects and relational data.</li>
+        <li>Supports object relationships such as one-to-many and many-to-many.</li>
+        <li>Helps with transaction management and persistence lifecycle.</li>
+        <li>Works well with Spring Boot, Jakarta EE, and enterprise Java apps.</li>
+      </ul>
+
+      <h3>Things to watch out for</h3>
+      <ul class="check-list">
+        <li>Lazy loading can cause unexpected database access if the session is closed.</li>
+        <li>Bad entity design can lead to N+1 query problems.</li>
+        <li>Hibernate does not replace SQL knowledge; performance tuning still matters.</li>
+        <li>Schema generation settings such as <code class="inline-code">ddl-auto</code> must be used carefully in production.</li>
+      </ul>
+    </section>
+
     <section class="card lesson" id="where-used">
       <h2>Where is Hibernate used?</h2>
-      <p>Hibernate is used in Java applications that need to persist and retrieve data from relational databases. Typical examples include:</p>
+      <p>Hibernate is used in Java applications that need to save and retrieve data from relational databases. Typical uses include:</p>
       <ul class="check-list">
-        <li>Web applications and REST APIs that store customers, orders, products, or accounts.</li>
-        <li>Enterprise systems with many related data entities and transactional workflows.</li>
-        <li>Spring Boot applications using Spring Data JPA with Hibernate as the persistence provider.</li>
-        <li>Batch jobs and backend services that read or update relational data.</li>
+        <li>Web applications and REST APIs</li>
+        <li>Enterprise systems with complex data models</li>
+        <li>Spring Boot services</li>
+        <li>Backend systems storing customers, orders, transactions, and reports</li>
       </ul>
-      <h3>What Hibernate can help with</h3>
-      <ul class="check-list">
-        <li>Mapping Java classes and relationships to tables and foreign keys.</li>
-        <li>Generating SQL for common create, read, update, and delete operations.</li>
-        <li>Managing entity state and coordinating database work within transactions.</li>
-        <li>Reducing repetitive low-level JDBC and result-set mapping code.</li>
-      </ul>
-      <h3>What to use carefully</h3>
-      <p>Hibernate does not make database design or performance automatic. Developers still need to understand SQL, indexes, transactions, query plans, and schema changes. Watch for issues such as loading too much data, the N+1 query problem, or keeping a database session open longer than necessary. For complex reports or highly specialized queries, explicit SQL may be the clearest choice.</p>
     </section>
 
     <section class="card lesson" id="knowledge-check">
@@ -487,6 +465,6 @@ if (existing != null) {
   <footer>
     <div class="footer-inner">Hibernate is a tool, not a substitute for understanding your database. Choose the right persistence approach for your application's needs.</div>
   </footer>
-<h1>basbg hello</h1>
+
 </body>
 </html>
