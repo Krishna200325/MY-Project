@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A practical beginner's guide to Spring JDBC, JdbcTemplate, parameterized queries, RowMapper, and transactions.">
+  <title>Spring JDBC — A Practical Guide</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1b2b36;
+      --muted: #536778;
+      --paper: #f3f7fa;
+      --card: #fff;
+      --blue: #3b82f6;
+      --blue-dark: #1d4ed8;
+      --green: #dff7ee;
+      --line: #dfe9f0;
+      --code: #112334;
+      --shadow: 0 14px 36px rgba(17, 51, 65, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.7;
+    }
+
+    a { color: var(--blue-dark); }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 76px 24px 70px;
+      background: linear-gradient(125deg, #0f172a, #1d4ed8);
+      color: #fff;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -200px;
+      width: 480px;
+      height: 480px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 45px rgba(255,255,255,0.035), 0 0 0 90px rgba(255,255,255,0.025);
+    }
+
+    .hero-inner, main, .footer-inner {
+      width: min(100% - 40px, 980px);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #dbeafe;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 700px;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      letter-spacing: -0.055em;
+      line-height: 1.04;
+    }
+
+    .hero-copy {
+      max-width: 660px;
+      margin: 22px 0 0;
+      color: #e2e8f0;
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+    }
+
+    .hero-link {
+      display: inline-block;
+      margin-top: 26px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background 160ms ease;
+    }
+
+    .hero-link:hover, .hero-link:focus-visible { background: rgba(255,255,255,0.13); }
+    main { padding: 42px 0 72px; }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 0.8fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .definition {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--green);
+      box-shadow: none;
+    }
+
+    .definition strong { display: block; margin-bottom: 8px; color: var(--blue-dark); }
+    section { scroll-margin-top: 24px; }
+    .lesson { margin-top: 22px; }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    h3 { margin: 24px 0 8px; font-size: 1.12rem; }
+    p { margin: 0 0 14px; }
+    p:last-child { margin-bottom: 0; }
+    .muted { color: var(--muted); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .step { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #f9fbfd; }
+    .step-number {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 9px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .step strong { display: block; margin-bottom: 5px; }
+    .step p { color: var(--muted); font-size: 0.94rem; }
+    .code-wrap { overflow-x: auto; margin: 16px 0; border-radius: 12px; background: var(--code); }
+
+    pre {
+      min-width: 510px;
+      margin: 0;
+      padding: 20px;
+      color: #e5f1ff;
+      font: 0.9rem/1.65 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+    .inline-code { padding: 2px 5px; border-radius: 4px; background: #edf4ff; }
+    .callout { margin-top: 16px; padding: 16px 18px; border-left: 4px solid var(--blue); border-radius: 0 9px 9px 0; background: #edf5ff; }
+
+    .comparison { width: 100%; margin-top: 16px; border-collapse: collapse; text-align: left; }
+    .comparison th, .comparison td { padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .comparison th { color: var(--blue-dark); font-size: 0.9rem; }
+    .check-list { margin: 10px 0 0; padding-left: 22px; }
+    .check-list li { margin: 8px 0; }
+
+    .primary-button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      padding: 12px 20px;
+      border-radius: 9px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .primary-button:hover { background: var(--blue-dark); }
+    footer { padding: 22px 20px; background: #0f172a; color: #dbeafe; font-size: 0.9rem; }
+
+    @media (max-width: 700px) {
+      .intro-grid, .steps { grid-template-columns: 1fr; }
+      .hero { padding: 58px 0; }
+      .hero-inner, main { width: min(100% - 28px, 980px); }
+      .comparison th, .comparison td { padding: 9px 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">A practical beginner's guide</p>
+      <h1>Spring JDBC</h1>
+      <p class="hero-copy">Learn how Spring simplifies direct database access with JdbcTemplate, prepared statements, row mapping, and transactions.</p>
+      <a class="hero-link" href="#what-is-spring-jdbc">Start learning <span aria-hidden="true">↓</span></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro-grid">
+      <section class="card" id="what-is-spring-jdbc">
+        <h2>What is Spring JDBC?</h2>
+        <p>Spring JDBC is a module in the Spring Framework that makes it easier to work with relational databases using JDBC. It removes repetitive tasks such as opening and closing connections, handling exceptions, and managing statements.</p>
+        <p>You still write SQL and decide how rows map to Java objects, giving you more direct control than an ORM.</p>
+      </section>
+      <aside class="card definition">
+        <strong>In one sentence</strong>
+        <p>Spring JDBC simplifies JDBC boilerplate while letting you write and control SQL directly.</p>
+      </aside>
+    </div>
+
+    <section class="card lesson" id="why-spring-jdbc">
+      <h2>Why use Spring JDBC?</h2>
+      <p>Plain JDBC is powerful, but each operation typically repeats connection management, statement handling, result processing, and exception cleanup. Spring's <code class="inline-code">JdbcTemplate</code> handles that infrastructure so your code can focus on SQL and application logic.</p>
+      <ul class="check-list">
+        <li>Executes SQL and manages JDBC resources safely.</li>
+        <li>Translates JDBC exceptions into Spring's consistent data-access exception hierarchy.</li>
+        <li>Supports parameterized queries to avoid unsafe SQL string construction.</li>
+        <li>Works with Spring transaction management and connection pools.</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="jdbc-template">
+      <h2>What is JdbcTemplate?</h2>
+      <p><code class="inline-code">JdbcTemplate</code> is Spring JDBC's central helper for executing SQL. It obtains connections from a configured <code class="inline-code">DataSource</code>, executes operations, processes results, and releases resources.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Configure a DataSource</strong>
+          <p>Provide the database URL, credentials, and JDBC driver, typically through Spring Boot configuration.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Inject JdbcTemplate</strong>
+          <p>Spring Boot configures it from the DataSource; inject it into a repository or DAO.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Run SQL</strong>
+          <p>Use template methods for queries, updates, and inserts with bound parameters.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card lesson" id="example">
+      <h2>Example: query and map a row</h2>
+      <p>This repository uses a parameterized query and a <code class="inline-code">RowMapper</code> to convert one database row into a Java object.</p>
+      <div class="code-wrap">
+        <pre><code>@Repository
+public class CustomerRepository {
+    private final JdbcTemplate jdbcTemplate;
+
+    public CustomerRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public Optional&lt;Customer&gt; findById(long id) {
+        String sql = "SELECT id, name FROM customers WHERE id = ?";
+        List&lt;Customer&gt; results = jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -&gt; new Customer(
+                rs.getLong("id"),
+                rs.getString("name")
+            ),
+            id
+        );
+        return results.stream().findFirst();
+    }
+
+    public int add(String name) {
+        String sql = "INSERT INTO customers (name) VALUES (?)";
+        return jdbcTemplate.update(sql, name);
+    }
+}</code></pre>
+      </div>
+      <div class="callout"><strong>Security note:</strong> bind values with <code class="inline-code">?</code> parameters or named parameters. Do not build SQL by concatenating user input.</div>
+    </section>
+
+    <section class="card lesson" id="data-access">
+      <h2>Queries, updates, and RowMapper</h2>
+      <ul class="check-list">
+        <li><strong>Query:</strong> use <code class="inline-code">query</code> when SQL returns multiple rows.</li>
+        <li><strong>Query for one value:</strong> use <code class="inline-code">queryForObject</code> for a single value or row; handle the case where no row is found.</li>
+        <li><strong>Insert, update, delete:</strong> use <code class="inline-code">update</code>; it returns the number of affected rows.</li>
+        <li><strong>RowMapper:</strong> maps each row in a ResultSet to a domain object. Use a named mapper when mapping is reused.</li>
+        <li><strong>NamedParameterJdbcTemplate:</strong> allows readable parameters such as <code class="inline-code">:customerId</code> instead of positional <code class="inline-code">?</code>.</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="transactions">
+      <h2>Transactions and configuration</h2>
+      <p>Spring can manage a group of database operations as one transaction. With Spring Boot, configure a supported <code class="inline-code">DataSource</code>, then use <code class="inline-code">@Transactional</code> on a service method when several operations must succeed or roll back together.</p>
+      <div class="code-wrap">
+        <pre><code>spring.datasource.url=jdbc:postgresql://localhost:5432/shop
+spring.datasource.username=app_user
+spring.datasource.password=${DB_PASSWORD}
+
+@Service
+public class CustomerService {
+    private final CustomerRepository customers;
+
+    public CustomerService(CustomerRepository customers) {
+        this.customers = customers;
+    }
+
+    @Transactional
+    public void register(String name) {
+        customers.add(name);
+        // Other related database operations join this transaction.
+    }
+}</code></pre>
+      </div>
+      <p class="muted">Keep credentials outside source control. Use environment variables or a secret manager, and use database migration tools such as Flyway or Liquibase to manage production schema changes.</p>
+    </section>
+
+    <section class="card lesson" id="comparison">
+      <h2>Spring JDBC vs Hibernate</h2>
+      <table class="comparison">
+        <thead>
+          <tr><th>Topic</th><th>Spring JDBC</th><th>Hibernate / JPA</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SQL</td><td>You write and control SQL directly</td><td>Often generated from entity operations; custom queries are also supported</td></tr>
+          <tr><td>Mapping</td><td>You map rows, for example with RowMapper</td><td>Entities and relationships are mapped by the persistence provider</td></tr>
+          <tr><td>Good fit</td><td>Focused queries, reports, and explicit SQL control</td><td>Domain models with many persisted entities and relationships</td></tr>
+          <tr><td>Trade-off</td><td>More manual mapping as operations grow</td><td>Requires understanding generated SQL, fetching, and entity lifecycle</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">Both approaches can be used in Spring applications. Choose based on the data model, SQL needs, and how much mapping control the application requires.</div>
+    </section>
+
+    <section class="card lesson" id="good-practices">
+      <h2>Good practices</h2>
+      <ul class="check-list">
+        <li>Use parameter binding rather than concatenating values into SQL.</li>
+        <li>Keep SQL and mapping code in a repository or DAO, separate from web controllers.</li>
+        <li>Use transactions for related writes that must succeed or fail together.</li>
+        <li>Check affected-row counts when an update or delete must change a record.</li>
+        <li>Use connection pooling and externalized credentials for deployed applications.</li>
+        <li>Test repositories against the database engine and SQL behavior you deploy.</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="where-used">
+      <h2>Where is Spring JDBC used?</h2>
+      <p>Spring JDBC is useful in Java backends that use relational databases and need direct SQL control, including REST services, reporting queries, batch jobs, and applications with straightforward data access.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">Spring JDBC manages JDBC infrastructure for you, but you remain in control of SQL and row mapping.</div>
+  </footer>
+</body>
+</html>
