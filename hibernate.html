@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A beginner-friendly guide to Hibernate: what it is, why it was created, how it works, and where it is used.">
+  <title>Hibernate — A Practical Guide</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172b3a;
+      --muted: #526777;
+      --paper: #f5f8fa;
+      --card: #ffffff;
+      --blue: #176b87;
+      --blue-dark: #104e65;
+      --mint: #d9f3ed;
+      --line: #dce6eb;
+      --code: #102c3b;
+      --shadow: 0 14px 38px rgba(19, 54, 73, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: var(--blue-dark); }
+
+    .hero {
+      overflow: hidden;
+      position: relative;
+      padding: 76px 24px 70px;
+      background:
+        radial-gradient(ellipse at 85% 15%, rgba(131, 219, 199, 0.25), transparent 34%),
+        linear-gradient(125deg, #102f41, #176b87);
+      color: #fff;
+    }
+
+    .hero::after {
+      position: absolute;
+      right: -100px;
+      bottom: -240px;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 45px rgba(255, 255, 255, 0.035), 0 0 0 90px rgba(255, 255, 255, 0.025);
+    }
+
+    .hero-inner, main, .footer-inner {
+      width: min(100% - 40px, 980px);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #a9e7d7;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin: 0;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      letter-spacing: -0.055em;
+      line-height: 1.04;
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      margin: 22px 0 0;
+      color: #e1f1f3;
+      font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    }
+
+    .hero-link {
+      display: inline-block;
+      margin-top: 26px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 160ms ease;
+    }
+
+    .hero-link:hover, .hero-link:focus-visible { background: rgba(255, 255, 255, 0.13); }
+
+    main { padding: 42px 0 72px; }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .definition {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--mint);
+      box-shadow: none;
+    }
+
+    .definition strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue-dark);
+      font-size: 1.05rem;
+    }
+
+    section { scroll-margin-top: 24px; }
+
+    .lesson { margin-top: 22px; }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
+
+    h3 { margin: 24px 0 8px; font-size: 1.12rem; }
+    p { margin: 0 0 14px; }
+    p:last-child { margin-bottom: 0; }
+
+    .muted { color: var(--muted); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .step {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f9fbfc;
+    }
+
+    .step-number {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 9px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    .step strong { display: block; margin-bottom: 5px; }
+    .step p { color: var(--muted); font-size: 0.94rem; }
+
+    .code-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border-radius: 12px;
+      background: var(--code);
+    }
+
+    pre {
+      min-width: 510px;
+      margin: 0;
+      padding: 20px;
+      color: #e4f4f2;
+      font: 0.9rem/1.65 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+    .inline-code { padding: 2px 5px; border-radius: 4px; background: #eaf1f4; }
+
+    .callout {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--blue);
+      border-radius: 0 9px 9px 0;
+      background: #edf6f8;
+    }
+
+    .comparison {
+      width: 100%;
+      margin-top: 16px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .comparison th, .comparison td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .comparison th { color: var(--blue-dark); font-size: 0.9rem; }
+
+    .check-list { margin: 10px 0 0; padding-left: 22px; }
+    .check-list li { margin: 8px 0; }
+
+    .primary-button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 750;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .primary-button:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .primary-button:focus-visible, .hero-link:focus-visible, .answer:focus-within {
+      outline: 3px solid #f1b840;
+      outline-offset: 3px;
+    }
+
+    footer {
+      padding: 22px 20px;
+      background: #102f41;
+      color: #dcebee;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+      .intro-grid, .steps { grid-template-columns: 1fr; }
+      .hero { padding: 58px 0; }
+      .hero-inner, main { width: min(100% - 28px, 980px); }
+      .comparison th, .comparison td { padding: 9px 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">A practical beginner's guide</p>
+      <h1>About Hibernate</h1>
+      <p class="hero-copy">Understand what it is, why Java developers use it, how it works with databases, and how it fits into a Spring application.</p>
+      <nav aria-label="Page sections">
+        <a class="hero-link" href="#what-is-hibernate">Start learning <span aria-hidden="true">↓</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro-grid">
+      <section class="card" id="what-is-hibernate">
+        <h2>What is Hibernate?</h2>
+        <p>Hibernate is an open-source <strong>Object-Relational Mapping (ORM)</strong> framework for Java. It helps map Java objects to relational database tables and handles SQL generation, object persistence, and query execution.</p>
+        <p>Instead of writing lots of repetitive JDBC code, you work with Java entities, and Hibernate takes care of the database communication.</p>
+      </section>
+      <aside class="card definition">
+        <strong>In one sentence</strong>
+        <p>Hibernate bridges the gap between Java objects and relational database tables.</p>
+      </aside>
+    </div>
+
+    <section class="card lesson" id="why-hibernate">
+      <h2>Why did Hibernate come about?</h2>
+      <p>Java applications work with objects, while databases store data in rows and columns. This difference is called the <strong>object-relational mismatch</strong>. Hibernate was created to reduce the tedious work of manually converting Java objects into SQL and back again.</p>
+      <p>Before ORM, developers often wrote code like JDBC statements, result-set mapping, and manual SQL handling. Hibernate simplifies that by letting developers focus on the domain model.</p>
+
+      <h3>Example: manual JDBC vs Hibernate</h3>
+      <div class="code-wrap">
+        <pre><code>String sql = "SELECT id, name FROM customers WHERE id = ?";
+PreparedStatement stmt = connection.prepareStatement(sql);
+stmt.setLong(1, customerId);
+ResultSet rs = stmt.executeQuery();
+
+if (rs.next()) {
+    Customer customer = new Customer();
+    customer.setId(rs.getLong("id"));
+    customer.setName(rs.getString("name"));
+}</code></pre>
+      </div>
+      <p class="muted">With Hibernate, the same operation can be much simpler:</p>
+      <div class="code-wrap">
+        <pre><code>Customer customer = session.find(Customer.class, customerId);</code></pre>
+      </div>
+    </section>
+
+    <section class="card lesson" id="how-it-works">
+      <h2>How does Hibernate work?</h2>
+      <p>Hibernate uses metadata, usually annotations or XML mappings, to know how Java classes correspond to database tables. It then uses that metadata to generate SQL statements automatically.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-number">1</span>
+          <strong>Define entity</strong>
+          <p>Create a Java class and map it to a table using annotations such as <code class="inline-code">@Entity</code>, <code class="inline-code">@Id</code>, and <code class="inline-code">@Column</code>.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <strong>Use session</strong>
+          <p>Open a Hibernate session or use <code class="inline-code">EntityManager</code> to save, update, delete, or load objects.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <strong>Generate SQL</strong>
+          <p>Hibernate creates the SQL, executes it, and converts rows back into Java objects.</p>
+        </div>
+      </div>
+
+      <div class="code-wrap" aria-label="Example entity class in Hibernate">
+        <pre><code>import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+
+@Entity
+public class Customer {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    protected Customer() {}
+
+    public Customer(String name) {
+        this.name = name;
+    }
+
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="card lesson" id="core-concepts">
+      <h2>Core Hibernate concepts</h2>
+      <ul class="check-list">
+        <li><strong>Entity:</strong> a Java class mapped to a database table.</li>
+        <li><strong>Session:</strong> the main interface for interacting with Hibernate and managing persistence operations.</li>
+        <li><strong>Transaction:</strong> a unit of work that is committed or rolled back as one logical action.</li>
+        <li><strong>Persistence context:</strong> the first-level cache where Hibernate tracks managed entities.</li>
+        <li><strong>Relationship mapping:</strong> associations such as <code class="inline-code">@OneToMany</code>, <code class="inline-code">@ManyToOne</code>, and <code class="inline-code">@ManyToMany</code>.</li>
+        <li><strong>Dialect:</strong> database-specific SQL behavior, such as Oracle, MySQL, PostgreSQL, or SQL Server.</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="hibernate-vs-jdbc">
+      <h2>Hibernate vs JDBC</h2>
+      <table class="comparison">
+        <thead>
+          <tr>
+            <th>Approach</th>
+            <th>What you usually write</th>
+            <th>What Hibernate/JPA does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>JDBC</td>
+            <td>SQL, connection code, prepared statements, result-set mapping</td>
+            <td>Nothing automatically; you handle everything manually</td>
+          </tr>
+          <tr>
+            <td>Hibernate / JPA</td>
+            <td>Entity classes and persistence calls</td>
+            <td>Generates SQL and maps results to Java objects</td>
+          </tr>
+          <tr>
+            <td>Spring Data JPA + Hibernate</td>
+            <td>Repositories, entity mappings, custom queries when needed</td>
+            <td>Spring manages wiring while Hibernate handles persistence</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card lesson" id="hibernate-spring">
+      <h2>Hibernate and Spring</h2>
+      <p><strong>Hibernate existed before Spring.</strong> It is a separate persistence framework, while Spring is a broader application framework. In a Spring application, Spring often manages dependency injection and transaction boundaries, while Hibernate handles persistence.</p>
+      <p>In Spring Boot projects, developers commonly use <strong>Spring Data JPA</strong> and Hibernate underneath it. JPA is the standard API, and Hibernate is one of its most popular implementations.</p>
+      <div class="callout">
+        <strong>Important:</strong> Spring Data JPA is not the same as Hibernate. It is a higher-level abstraction that often uses Hibernate behind the scenes.
+      </div>
+    </section>
+
+    <section class="card lesson" id="database-config">
+      <h2>How Hibernate connects to a database</h2>
+      <p>Hibernate uses JDBC to connect to a database. You need a database driver, a JDBC URL, a username, and a password. The database URL tells Hibernate which database server and database to connect to.</p>
+      <p>In a Spring Boot project, this configuration usually goes in <code class="inline-code">application.properties</code> or <code class="inline-code">application.yml</code>.</p>
+      <div class="code-wrap">
+        <pre><code>spring.datasource.url=jdbc:oracle:thin:@localhost:1521:orcl
+spring.datasource.username=system
+spring.datasource.password=secret
+spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
+spring.jpa.hibernate.ddl-auto=update</code></pre>
+      </div>
+      <p class="muted">In real applications, it is also important to manage transactions carefully and choose a schema strategy that fits your environment.</p>
+    </section>
+
+    <section class="card lesson" id="advantages">
+      <h2>Advantages of Hibernate</h2>
+      <ul class="check-list">
+        <li>Reduces repetitive JDBC and SQL boilerplate.</li>
+        <li>Improves productivity when working with Java objects and relational data.</li>
+        <li>Supports object relationships such as one-to-many and many-to-many.</li>
+        <li>Helps with transaction management and persistence lifecycle.</li>
+        <li>Works well with Spring Boot, Jakarta EE, and enterprise Java apps.</li>
+      </ul>
+
+      <h3>Things to watch out for</h3>
+      <ul class="check-list">
+        <li>Lazy loading can cause unexpected database access if the session is closed.</li>
+        <li>Bad entity design can lead to N+1 query problems.</li>
+        <li>Hibernate does not replace SQL knowledge; performance tuning still matters.</li>
+        <li>Schema generation settings such as <code class="inline-code">ddl-auto</code> must be used carefully in production.</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="where-used">
+      <h2>Where is Hibernate used?</h2>
+      <p>Hibernate is used in Java applications that need to save and retrieve data from relational databases. Typical uses include:</p>
+      <ul class="check-list">
+        <li>Web applications and REST APIs</li>
+        <li>Enterprise systems with complex data models</li>
+        <li>Spring Boot services</li>
+        <li>Backend systems storing customers, orders, transactions, and reports</li>
+      </ul>
+    </section>
+
+    <section class="card lesson" id="knowledge-check">
+      <h2>Ready to test your understanding?</h2>
+      <p class="muted">Continue to the next page for the test.</p>
+      <a class="primary-button" href="test.html">Take the test</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">Hibernate is a tool, not a substitute for understanding your database. Choose the right persistence approach for your application's needs.</div>
+  </footer>
+
+</body>
+</html>

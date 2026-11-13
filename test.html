@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hibernate Coding Assessment</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1b2b36;
+      --muted: #536778;
+      --paper: #f4f7fb;
+      --card: #fff;
+      --blue: #176b87;
+      --blue-dark: #104e65;
+      --line: #dfe9ef;
+      --green: #dff7ee;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Segoe UI", sans-serif; }
+    main { width: min(100% - 32px, 940px); margin: 40px auto 80px; }
+    .back, button {
+      display: inline-block; border: 0; border-radius: 9px; padding: 11px 17px;
+      background: var(--blue); color: #fff; font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+    }
+    .back:hover, button:hover { background: var(--blue-dark); }
+    article { margin-top: 20px; padding: clamp(20px, 4vw, 34px); border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 14px 36px #11334112; }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3rem); }
+    .muted { color: var(--muted); }
+    .notice { margin: 22px 0; padding: 14px 16px; border-left: 4px solid var(--blue); background: #edf5ff; }
+    .task { margin-top: 18px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #fbfdff; }
+    .task h2 { margin: 0 0 8px; font-size: 1.12rem; }
+    .task p { margin: 0 0 12px; }
+    textarea { width: 100%; min-height: 150px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; resize: vertical; font: 0.9rem/1.5 Consolas, monospace; }
+    .verified { display: flex; align-items: center; gap: 9px; margin-top: 12px; font-weight: 600; }
+    .submit { margin-top: 22px; text-align: center; }
+    #result { display: none; margin-top: 24px; padding: 18px; border: 1px solid #c4e2d5; border-radius: 12px; background: var(--green); }
+    @media (max-width: 600px) { main { margin-top: 20px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="hibernate.html">Back to Hibernate Guide</a>
+    <article>
+      <h1>Hibernate Coding Assessment</h1>
+      <p class="muted">Complete these practical tasks as you would in a technical screening. Write code, run it in your Java project, and mark each verified task.</p>
+      <p class="notice"><strong>Note:</strong> This standalone HTML page cannot compile Java. The marks below count tasks you entered and marked tested; verify correctness in your IDE.</p>
+
+      <form id="assessment">
+        <section class="task">
+          <h2>Task 1 — Create a Customer entity</h2>
+          <p>Map a Customer class to a <code>customers</code> table. Add a generated Long ID, a required name, and a protected no-argument constructor.</p>
+          <textarea name="code1" aria-label="Customer entity code" placeholder="Write your Java code here"></textarea>
+          <label class="verified"><input type="checkbox" name="tested1"> I implemented and tested this task</label>
+        </section>
+        <section class="task">
+          <h2>Task 2 — Build a repository</h2>
+          <p>Create a Spring Data JPA repository for Customer with a method to find a customer by email.</p>
+          <textarea name="code2" aria-label="Customer repository code" placeholder="Write your Java code here"></textarea>
+          <label class="verified"><input type="checkbox" name="tested2"> I implemented and tested this task</label>
+        </section>
+        <section class="task">
+          <h2>Task 3 — Add a transactional service</h2>
+          <p>Implement a service method that saves a customer using constructor-injected repository dependency and a transaction boundary.</p>
+          <textarea name="code3" aria-label="Customer service code" placeholder="Write your Java code here"></textarea>
+          <label class="verified"><input type="checkbox" name="tested3"> I implemented and tested this task</label>
+        </section>
+        <section class="task">
+          <h2>Task 4 — Map an order relationship</h2>
+          <p>Map Order to Customer as many-to-one. Choose a suitable fetch strategy and avoid exposing an unnecessary full entity graph in an API response.</p>
+          <textarea name="code4" aria-label="Order relationship code" placeholder="Write your Java code here"></textarea>
+          <label class="verified"><input type="checkbox" name="tested4"> I implemented and tested this task</label>
+        </section>
+        <section class="task">
+          <h2>Task 5 — Fix an N+1 query</h2>
+          <p>Orders are loaded in a list and each order triggers another query for its customer. Show a repository query or entity graph that fetches the needed customers efficiently.</p>
+          <textarea name="code5" aria-label="N plus one solution code" placeholder="Write your Java code here"></textarea>
+          <label class="verified"><input type="checkbox" name="tested5"> I implemented and tested this task</label>
+        </section>
+        <div class="submit"><button type="submit">Submit Assessment</button></div>
+      </form>
+      <div id="result" role="status" aria-live="polite"></div>
+    </article>
+  </main>
+  <script>
+    const form = document.getElementById('assessment');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      let marks = 0;
+      for (let task = 1; task <= 5; task++) {
+        if (form.elements[`code${task}`].value.trim() && form.elements[`tested${task}`].checked) marks++;
+      }
+      const percentage = Math.round((marks / 5) * 100);
+      result.innerHTML = `<strong>Verified task marks: ${marks}/5</strong><br>Progress: ${percentage}%<br>Marks count tasks with code entered and marked tested. Review the code in your Java project for correctness.`;
+      result.style.display = 'block';
+      result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  </script>
+</body>
+</html>
