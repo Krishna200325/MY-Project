@@ -1,0 +1,32 @@
+company:
+  company_name: Tech Solutions
+  employee_count: 150
+  annual_revenue: 2500000.50
+  active: true
+  branch_code: H
+
+  emplyoee_Names:
+    - Rahul
+    - Amit
+    - Sneha
+    - Priya
+
+  emplyoeDepartment:
+    101: Java
+    102: Python
+    103: Testing
+
+  uniqueSkilss:
+    - Java
+    - Spring Boot
+    - Microservices
+
+  CompanyAdd:
+    city: Hyderabad
+    state: Telangana
+    country: India
+
+  location:
+    - Hyderabad
+    - Bangalore
+    - Pune

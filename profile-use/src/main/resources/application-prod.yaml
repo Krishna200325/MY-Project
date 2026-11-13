@@ -1,0 +1,5 @@
+payment:
+ modeName: Producation Phase
+ url: http://localHost:8082/payment/Development
+ environment: Producation
+ status: Live

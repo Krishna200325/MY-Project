@@ -1,0 +1,6 @@
+database:
+ driverClassName: oracle.jdbc.OracleDriver
+ url:  jdbc:oracle:thin:@localhost:1521:FREE
+ username: system
+ password: oracle123
+ environment: Development

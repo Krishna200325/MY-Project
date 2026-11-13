@@ -1,0 +1,36 @@
+shopping:
+ storeName: Amazone store
+ totalProducts: 550
+ deliveryCharge: 40
+ onlinePayment: True
+ storeCode: A
+
+ productNames:
+  - Laptop
+  - Mobile
+  - Keyword
+  - Mouse
+
+ productPrice:
+    101: 45000
+    102: 25000
+    103: 1500
+    104: 800
+
+ paymentMethods:
+  - credit Card
+  - Upi payment
+  - COD
+  - Debit Card
+
+ storeAddress:
+  city: Hyderabad
+  state: Telangana
+  country: India
+
+ deliveryLocations:
+    Hyderabad
+    Chennai
+    Bangalore
+
+  

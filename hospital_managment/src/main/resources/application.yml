@@ -1,0 +1,37 @@
+hospital:
+ hospitalName: appolo hospital
+ totalBeds: 350
+ consultationFee: 800 
+ emergencyAvailable: True
+ hospitalCode: 101
+
+ doctorNames:
+  - Dr.Krishna
+  - Dr. sahil
+  - Dr. Ramesh
+  - Dr.Akash
+
+ departmentHeads:
+   Cardiology: Dr.Krishna
+   Neurology: Dr. Sahil
+   Orthopedics: Dr.Akash
+
+ availableFacilities:
+   - ICU
+   - Emergency
+   - Pharmacy
+   - Ambulance
+
+ hospitalAddress:
+   city: Hyderabad
+   state: Telangana
+   pincode: 500001
+
+ branchlocation:
+      - Hyderabad
+      - Bangalore
+      - Chennai
+
+
+
+  

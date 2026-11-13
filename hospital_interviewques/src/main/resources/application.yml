@@ -1,0 +1,22 @@
+hospital:
+ hospitalCode: 101
+ hospitalName: YashHoda
+
+ listOfTreatements:
+  - Cardiac
+  - ENT
+  - Ortho
+  - Pediatric
+  - Gastro
+
+ contactPerson: Mathews
+
+ contactNumber: 14567895
+
+ location: Ameerpet
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+payment:
+ modeName: QA Phase
+ url: http://localHost:8081/payment/Development
+ environment: Testing
+ status: Testing Mock

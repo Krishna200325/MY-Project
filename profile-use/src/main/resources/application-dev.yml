@@ -1,0 +1,5 @@
+payment:
+ modeName: Development Phase
+ url: http://localHost:8080/payment/Development
+ environment: Development
+ status: Mock
